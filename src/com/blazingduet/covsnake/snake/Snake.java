@@ -144,6 +144,38 @@ public class Snake implements Movable {
 		HealthPoint = healthPoint;
 	}
 
+	public boolean isMovingUp() {
+		return isMovingUp;
+	}
+
+	public void setMovingUp(boolean isMovingUp) {
+		this.isMovingUp = isMovingUp;
+	}
+
+	public boolean isMovingDown() {
+		return isMovingDown;
+	}
+
+	public void setMovingDown(boolean isMovingDown) {
+		this.isMovingDown = isMovingDown;
+	}
+
+	public boolean isMovingLeft() {
+		return isMovingLeft;
+	}
+
+	public void setMovingLeft(boolean isMovingLeft) {
+		this.isMovingLeft = isMovingLeft;
+	}
+
+	public boolean isMovingRight() {
+		return isMovingRight;
+	}
+
+	public void setMovingRight(boolean isMovingRight) {
+		this.isMovingRight = isMovingRight;
+	}
+
 	
 	
 	

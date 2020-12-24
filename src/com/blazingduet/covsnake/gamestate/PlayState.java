@@ -25,7 +25,7 @@ public class PlayState extends GameState {
 	
 	private Snake snake;
 	private int score;
-	private int movementSpeedDelay, healthDecreaseSpeed;
+	private int movementSpeedDelay, healthDecreaseDelay;
 	
 	public PlayState(JFrame referred) {
 		super(referred);
@@ -33,20 +33,20 @@ public class PlayState extends GameState {
 		map = loadImg("Map.png");
 		this.score = 0;
 		this.movementSpeedDelay = 5000;
-		this.healthDecreaseSpeed = 1000;
+		this.healthDecreaseDelay = 1000;
 		snake = new Snake();
 		
 		
 		referred.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if(e.getKeyChar() == 'w' || e.getKeyChar() == 'W') {
+				if(!snake.isMovingDown() && (e.getKeyChar() == 'w' || e.getKeyChar() == 'W')) {
 					snake.setDirection(true,false,false,false);
-				}else if(e.getKeyChar() == 'a' || e.getKeyChar() == 'A') {
+				}else if(!snake.isMovingRight() && (e.getKeyChar() == 'a' || e.getKeyChar() == 'A')) {
 					snake.setDirection(false,false,true,false);
-				}else if(e.getKeyChar() == 's' || e.getKeyChar() == 'S') {
+				}else if(!snake.isMovingUp() && (e.getKeyChar() == 's' || e.getKeyChar() == 'S')) {
 					snake.setDirection(false,true,false,false);
-				}else if(e.getKeyChar() == 'd' || e.getKeyChar() == 'D') {
+				}else if(!snake.isMovingLeft() && (e.getKeyChar() == 'd' || e.getKeyChar() == 'D')) {
 					snake.setDirection(false,false,false,true);
 				}
 			}
@@ -75,7 +75,7 @@ public class PlayState extends GameState {
 					snake.setHealthPoint(snake.getHealthPoint()-2);
 
 					try {
-						Thread.sleep(healthDecreaseSpeed);
+						Thread.sleep(healthDecreaseDelay);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
