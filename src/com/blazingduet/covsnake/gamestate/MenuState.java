@@ -63,6 +63,7 @@ public class MenuState extends GameState {
 		case 1:
 			referred.setContentPane(new PlayState(referred));
 			referred.validate();
+			break;
 		}
 	}
 
