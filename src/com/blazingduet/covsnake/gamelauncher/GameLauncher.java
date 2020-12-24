@@ -1,4 +1,4 @@
-package com.blazingduet.covsnake.gameengine;
+package com.blazingduet.covsnake.gamelauncher;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
