@@ -19,9 +19,9 @@ public class MenuState extends GameState {
 	
 	public MenuState(JFrame referred) {
 		super(referred);
-		backgroundMenu = loadImg("BackgroundMenu.png");
-		newGameBtn = loadImg("NewGame.png");
-		highScoreBtn = loadImg("HighScore.png");
+		backgroundMenu = this.loadImg("BackgroundMenu.png");
+		newGameBtn = this.loadImg("NewGame.png");
+		highScoreBtn = this.loadImg("HighScore.png");
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -59,7 +59,11 @@ public class MenuState extends GameState {
 
 	@Override
 	public void stateChange(int state) {
-		
+		switch(state) {
+		case 1:
+			referred.setContentPane(new PlayState(referred));
+			referred.validate();
+		}
 	}
 
 }

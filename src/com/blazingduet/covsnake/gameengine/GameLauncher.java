@@ -19,7 +19,7 @@ public class GameLauncher {
 				frame.setContentPane(gs);
 				frame.setVisible(true);
 				frame.pack();
-				
+				frame.setResizable(false);
 			}
 		}); 
 	}
