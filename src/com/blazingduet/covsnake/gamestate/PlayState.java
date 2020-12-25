@@ -14,14 +14,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 
+import com.blazingduet.covsnake.food.Apple;
+import com.blazingduet.covsnake.food.Food;
 import com.blazingduet.covsnake.snake.Snake;
 
 public class PlayState extends GameState {
+	public static final int HEADER_START_POSITION_X = 0, HEADER_START_POSITION_Y = 0;
+	public static final int MAP_START_POSITION_X = 0, MAP_START_POSITION_Y = 80;
 	
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
@@ -33,6 +38,7 @@ public class PlayState extends GameState {
 	private int movementSpeedDelay, healthDecreaseDelay;
 	private boolean isContinueBannerDrawn;
 	private List<Character> tempMoveInput;
+	private List<Food> food;
 	
 	public PlayState(JFrame referred) {
 		super(referred);
@@ -45,7 +51,8 @@ public class PlayState extends GameState {
 		this.healthDecreaseDelay = 1000;
 		snake = new Snake();
 		tempMoveInput = new ArrayList<>();
-		
+		food = new ArrayList<>();
+		food.add(generateApple());
 		
 		referred.addKeyListener(new KeyAdapter() {
 			@Override
@@ -68,6 +75,7 @@ public class PlayState extends GameState {
 				while(snake.getHealthPoint()>0) {
 					checkMove();
 					snake.move();
+					checkFood();
 					repaint();
 					try {
 						Thread.sleep(movementSpeedDelay/REFRESH_RATE);
@@ -175,12 +183,42 @@ public class PlayState extends GameState {
 		continueAnimationThread.start();
 	}
 	
+	private void checkFood() {
+		List<Integer> tempIndexDeleted = new ArrayList<>();
+		
+		for(int i = 0; i < food.size(); i++) {
+			if(food.get(i).eatenBySnake(snake)) {
+				tempIndexDeleted.add(i);
+				
+				if(food.get(i) instanceof Apple) {
+					food.add(generateApple());
+				}
+			}
+		}
+		
+		for(int i : tempIndexDeleted) {
+			food.remove(i);
+		}
+	}
+	
+	private Apple generateApple() {
+		Random rnd = new Random();
+		int rndX = rnd.nextInt((GameState.PANEL_WIDTH-MAP_START_POSITION_X)/Food.WIDTH_SIZE) * Food.WIDTH_SIZE + MAP_START_POSITION_X;
+		int rndY = rnd.nextInt((GameState.PANEL_HEIGHT-MAP_START_POSITION_Y)/Food.HEIGHT_SIZE) * Food.HEIGHT_SIZE + MAP_START_POSITION_Y;
+		return new Apple(rndX,rndY);
+	}
+	
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(header, 0, 0, null);
+		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
+		g.drawString("Score: "+snake.getScore(),100, 40);
 		g.drawString("HP: "+snake.getHealthPoint(),600, 40);
 		
-		g.drawImage(map, 0, 80, null);
+		g.drawImage(map, MAP_START_POSITION_X, MAP_START_POSITION_Y, null);
+		
+		for(Food i : food) {
+			i.render(g);
+		}
 		
 		snake.render(g);
 		

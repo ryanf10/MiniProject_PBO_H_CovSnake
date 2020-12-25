@@ -13,13 +13,13 @@ import com.blazingduet.covsnake.movable.Movable;
 
 public class Snake implements Movable {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/snake/";
-	
+	private static final int MAX_HEALTH_POINT = 100;
 	private static Image headUp, headDown, headLeft, headRight, body;
 	
 	private boolean isMovingUp, isMovingDown, isMovingLeft, isMovingRight;
 	private List<Integer> bodyX;
 	private List<Integer> bodyY;
-	private int length,HealthPoint;
+	private int length,HealthPoint,score;
 	
 	public Snake() {
 		this.bodyX = new ArrayList<>();
@@ -140,44 +140,52 @@ public class Snake implements Movable {
 		return HealthPoint;
 	}
 
-	public void setHealthPoint(int healthPoint) {
-		HealthPoint = healthPoint;
+	public void setHealthPoint(int HealthPoint) {
+		if(HealthPoint > MAX_HEALTH_POINT) {
+			this.HealthPoint = MAX_HEALTH_POINT;
+		}else {
+			this.HealthPoint = HealthPoint;
+		}
+
 	}
 
 	public boolean isMovingUp() {
 		return isMovingUp;
 	}
 
-	public void setMovingUp(boolean isMovingUp) {
-		this.isMovingUp = isMovingUp;
-	}
-
 	public boolean isMovingDown() {
 		return isMovingDown;
-	}
-
-	public void setMovingDown(boolean isMovingDown) {
-		this.isMovingDown = isMovingDown;
 	}
 
 	public boolean isMovingLeft() {
 		return isMovingLeft;
 	}
 
-	public void setMovingLeft(boolean isMovingLeft) {
-		this.isMovingLeft = isMovingLeft;
-	}
-
 	public boolean isMovingRight() {
 		return isMovingRight;
 	}
-
-	public void setMovingRight(boolean isMovingRight) {
-		this.isMovingRight = isMovingRight;
+	
+	public int getScore() {
+		return score;
 	}
 
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public int getHeadX() {
+		return bodyX.get(0);
+	}
 	
+	public int getHeadY() {
+		return bodyY.get(0);
+	}
 	
+	public void addBody() {
+		this.bodyX.add(bodyX.get(this.length-1));
+		this.bodyY.add(bodyY.get(this.length-1));
+		this.length++;
+	}
 	
 
 }

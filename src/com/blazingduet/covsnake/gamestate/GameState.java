@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 public abstract class GameState extends JPanel {
 	
 	JFrame referred;
-	private final static int PANEL_WIDTH = 800, PANEL_HEIGHT = 600;
+	public final static int PANEL_WIDTH = 800, PANEL_HEIGHT = 600;
 	
 	
 	public GameState(JFrame referred) {
