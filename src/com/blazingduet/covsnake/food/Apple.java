@@ -10,32 +10,27 @@ import javax.imageio.ImageIO;
 import com.blazingduet.covsnake.snake.Snake;
 
 public class Apple extends Food {
-	
-	private static final String DEFAULT_LOCATION="src/com/blazingduet/covsnake/resources/food/";
-	
+	private Image imgApple;
+
 	public Apple(int positionX, int positionY) {
 		super(positionX,positionY);
-		super.setImgFood(this.loadImg("Apple.png"));
-	}
-	
-	private Image loadImg(String filename) {
-		try {
-			return ImageIO.read(new File(DEFAULT_LOCATION+filename));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+		imgApple = super.loadImg("Apple.png");
 	}
 	
 	@Override
-	public void giveBenefit(Snake s) {
-		s.setHealthPoint(s.getHealthPoint() + 20);
-		s.setScore(s.getScore() + 10);
+	public void giveBenefit(Snake snake) {
+		snake.setHealthPoint(snake.getHealthPoint() + 20);
+		
+		if(snake.isActiveMultiplier()) {			
+			snake.setScore(snake.getScore() + 10 * 2);
+		}else {
+			snake.setScore(snake.getScore() + 10);
+		}
 	}
 
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(super.getImgFood(),super.getPositionX(), super.getPositionY(),null);
+		g.drawImage(this.imgApple,super.getPositionX(), super.getPositionY(),null);
 	}
 
 }

@@ -13,6 +13,8 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -21,12 +23,15 @@ import javax.swing.JFrame;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 
 import com.blazingduet.covsnake.food.Apple;
+import com.blazingduet.covsnake.food.Chicken;
 import com.blazingduet.covsnake.food.Food;
+import com.blazingduet.covsnake.food.Star;
 import com.blazingduet.covsnake.snake.Snake;
 
 public class PlayState extends GameState {
 	public static final int HEADER_START_POSITION_X = 0, HEADER_START_POSITION_Y = 0;
 	public static final int MAP_START_POSITION_X = 0, MAP_START_POSITION_Y = 80;
+	public static final int GRASS_AREA_START_X = 80, GRASS_AREA_START_Y = 60, GRASS_AREA_WIDTH = 640, GRASS_AREA_HEIGHT = 400;
 	
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
@@ -34,9 +39,9 @@ public class PlayState extends GameState {
 	private static Image header, map, gameOverBanner,continueBanner;
 	
 	private Snake snake;
-	private int score;
+	private int score, foodEatenBySnake;
 	private int movementSpeedDelay, healthDecreaseDelay;
-	private boolean isContinueBannerDrawn;
+	private boolean isContinueBannerDrawn, isStarAlreadyOnMap;
 	private List<Character> tempMoveInput;
 	private List<Food> food;
 	
@@ -47,14 +52,15 @@ public class PlayState extends GameState {
 		gameOverBanner = loadImg("GameOver.png");
 		continueBanner = loadImg("Continue.png");
 		this.score = 0;
+		this.foodEatenBySnake = 0;
 		this.movementSpeedDelay = 5000;
 		this.healthDecreaseDelay = 1000;
 		snake = new Snake();
 		tempMoveInput = new ArrayList<>();
-		food = new ArrayList<>();
+		food = Collections.synchronizedList(new ArrayList<>());
 		food.add(generateApple());
 		
-		referred.addKeyListener(new KeyAdapter() {
+		this.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if(e.getKeyChar() == 'w' || e.getKeyChar() == 'W' || e.getKeyCode() == KeyEvent.VK_UP) {
@@ -68,6 +74,7 @@ public class PlayState extends GameState {
 				}
 			}
 		});
+		this.setFocusable(true);
 		
 		Thread moveThread = new Thread() {
 			@Override
@@ -142,15 +149,16 @@ public class PlayState extends GameState {
 	
 	
 	private void addListenerGameOver() {
-		referred.removeKeyListener(referred.getKeyListeners()[0]);
-		referred.addKeyListener(new KeyAdapter() {
+		this.removeKeyListener(this.getKeyListeners()[0]);
+		
+		this.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				stateChange(0);
 			}
 		});
 		
-		addMouseListener(new MouseAdapter() {
+		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				stateChange(0);
@@ -184,28 +192,115 @@ public class PlayState extends GameState {
 	}
 	
 	private void checkFood() {
-		List<Integer> tempIndexDeleted = new ArrayList<>();
+		//hapus food yang sudah termakan
+		boolean doGenerateFood = false;
 		
-		for(int i = 0; i < food.size(); i++) {
-			if(food.get(i).eatenBySnake(snake)) {
-				tempIndexDeleted.add(i);
-				
-				if(food.get(i) instanceof Apple) {
-					food.add(generateApple());
+		synchronized (food) {
+			Iterator<Food> it = food.iterator();
+			while(it.hasNext()) {
+				Food temp = it.next();
+				if(temp.eatenBySnake(snake)) {
+					this.foodEatenBySnake++;
+					
+					if(this.foodEatenBySnake % 5 == 0) {
+						//generate 5 obstacle
+					}
+					
+					if(temp instanceof Apple) {
+						doGenerateFood = true;
+					}else if(temp instanceof Star) {
+						isStarAlreadyOnMap = false;
+					}
+					
+					it.remove();
+				}else if(temp instanceof Star) {
+					if(!((Star)temp).isAvailable()) {
+						it.remove();
+						isStarAlreadyOnMap = false;
+					}
+				}else if(temp instanceof Chicken) {
+					if(!((Chicken)temp).isAvailable()) {
+						it.remove();
+					}
 				}
 			}
-		}
-		
-		for(int i : tempIndexDeleted) {
-			food.remove(i);
+			if(doGenerateFood) {
+				//setelah apple dimakan, generate sebuah apple baru
+				food.add(generateApple());
+				
+				Random rnd = new Random();
+				
+				//generate star dengan chance 30%
+				if(!snake.isActiveMultiplier() && !isStarAlreadyOnMap) {
+					int rndGenerateStar = rnd.nextInt(101);
+					if(rndGenerateStar >= 0) {
+						food.add(generateStar());
+						isStarAlreadyOnMap = true;
+					}
+				}
+				
+				//generate chicken dengan chance 30%
+				int rndGenerateChicken = rnd.nextInt(101);
+				if(rndGenerateChicken >= 0) {
+					food.add(generateChicken());
+				}
+	
+			}
+						
 		}
 	}
 	
 	private Apple generateApple() {
 		Random rnd = new Random();
-		int rndX = rnd.nextInt((GameState.PANEL_WIDTH-MAP_START_POSITION_X)/Food.WIDTH_SIZE) * Food.WIDTH_SIZE + MAP_START_POSITION_X;
-		int rndY = rnd.nextInt((GameState.PANEL_HEIGHT-MAP_START_POSITION_Y)/Food.HEIGHT_SIZE) * Food.HEIGHT_SIZE + MAP_START_POSITION_Y;
+		int rndX,rndY;
+		do {
+			rndX = rnd.nextInt(GRASS_AREA_WIDTH/Food.WIDTH_SIZE) * Food.WIDTH_SIZE + MAP_START_POSITION_X + GRASS_AREA_START_X;
+			rndY = rnd.nextInt(GRASS_AREA_HEIGHT/Food.HEIGHT_SIZE) * Food.HEIGHT_SIZE + MAP_START_POSITION_Y + GRASS_AREA_START_Y;
+		}while(!isSpaceAvailable(rndX,rndY));
+		
 		return new Apple(rndX,rndY);
+	}
+	
+	private Star generateStar() {
+		Random rnd = new Random();
+		int rndX,rndY;
+		do {
+			rndX = rnd.nextInt(GRASS_AREA_WIDTH/Food.WIDTH_SIZE) * Food.WIDTH_SIZE + MAP_START_POSITION_X + GRASS_AREA_START_X;
+			rndY = rnd.nextInt(GRASS_AREA_HEIGHT/Food.HEIGHT_SIZE) * Food.HEIGHT_SIZE + MAP_START_POSITION_Y + GRASS_AREA_START_Y;
+		}while(!isSpaceAvailable(rndX,rndY));
+		
+		return new Star(rndX,rndY);
+	}
+	
+	private Chicken generateChicken() {
+		Random rnd = new Random();
+		int rndX,rndY;
+		do {
+			rndX = rnd.nextInt(GRASS_AREA_WIDTH/Food.WIDTH_SIZE) * Food.WIDTH_SIZE + MAP_START_POSITION_X + GRASS_AREA_START_X;
+			rndY = rnd.nextInt(GRASS_AREA_HEIGHT/Food.HEIGHT_SIZE) * Food.HEIGHT_SIZE + MAP_START_POSITION_Y + GRASS_AREA_START_Y;
+		}while(!isSpaceAvailable(rndX,rndY));
+		
+		return new Chicken(rndX,rndY,this);
+	}
+	
+	public boolean isSpaceAvailable(int positionX, int positionY) {
+		for(int i = 0; i < snake.getLength(); i++) {
+			if(snake.getBodyX().get(i) == positionX && snake.getBodyY().get(i) == positionY) {
+				return false;
+			}
+		}
+		
+		synchronized (food) {
+			Iterator<Food> it = food.iterator();
+			while(it.hasNext()) {
+				Food temp = it.next();				
+				if(temp.getPositionX() == positionX && temp.getPositionY() == positionY) {	
+					return false;
+				}
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
@@ -216,8 +311,12 @@ public class PlayState extends GameState {
 		
 		g.drawImage(map, MAP_START_POSITION_X, MAP_START_POSITION_Y, null);
 		
-		for(Food i : food) {
-			i.render(g);
+		synchronized (food) {
+			Iterator<Food> it = food.iterator();
+			while(it.hasNext()) {
+				Food temp = it.next();				
+				temp.render(g);
+			}
 		}
 		
 		snake.render(g);
@@ -246,9 +345,9 @@ public class PlayState extends GameState {
 	public void stateChange(int state) {
 		switch(state) {
 		case 0:
-			referred.removeKeyListener(referred.getKeyListeners()[0]);
 			referred.setContentPane(new MenuState(referred));
 			referred.validate();
+			referred.getContentPane().requestFocusInWindow();
 			break;
 		}
 	}

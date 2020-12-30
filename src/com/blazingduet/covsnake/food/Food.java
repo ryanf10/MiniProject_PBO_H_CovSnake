@@ -2,39 +2,44 @@ package com.blazingduet.covsnake.food;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
 
 import com.blazingduet.covsnake.snake.Snake;
 
 public abstract class Food {
 	public static final int HEIGHT_SIZE = 20, WIDTH_SIZE = 20;
+	private static final String DEFAULT_LOCATION="src/com/blazingduet/covsnake/resources/food/";
 	
 	private int positionX, positionY;
-	private Image imgFood;
 	
 	public Food(int positionX, int positionY) {
 		this.positionX = positionX;
 		this.positionY = positionY;
 	}
 	
-	public abstract void giveBenefit(Snake s);
+	public abstract void giveBenefit(Snake snake);
 	public abstract void render(Graphics g);
 	
-	public boolean eatenBySnake(Snake s) {
-		if(s.getHeadX() == this.positionX && s.getHeadY() == this.positionY) {
-			s.addBody();
-			this.giveBenefit(s);
+	public boolean eatenBySnake(Snake snake) {
+		if(snake.getHeadX() == this.positionX && snake.getHeadY() == this.positionY) {
+			snake.addBody();
+			this.giveBenefit(snake);
 			return true;
 		}
 		return false;
 	}
-
-	public Image getImgFood() {
-		return imgFood;
-	}
-
-	public void setImgFood(Image imgFood) {
-		this.imgFood = imgFood;
+	
+	protected Image loadImg(String filename) {
+		try {
+			return ImageIO.read(new File(DEFAULT_LOCATION+filename));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	public int getPositionX() {

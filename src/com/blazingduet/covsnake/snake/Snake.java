@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -13,22 +14,25 @@ import com.blazingduet.covsnake.movable.Movable;
 
 public class Snake implements Movable {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/snake/";
-	private static final int MAX_HEALTH_POINT = 100;
+	public static final int MAX_HEALTH_POINT = 100;
 	private static Image headUp, headDown, headLeft, headRight, body;
 	
 	private boolean isMovingUp, isMovingDown, isMovingLeft, isMovingRight;
 	private List<Integer> bodyX;
 	private List<Integer> bodyY;
 	private int length,HealthPoint,score;
+	private boolean activeMultiplier;
 	
 	public Snake() {
-		this.bodyX = new ArrayList<>();
-		this.bodyY = new ArrayList<>();
+		this.bodyX = Collections.synchronizedList(new ArrayList<>());
+		this.bodyY = Collections.synchronizedList(new ArrayList<>());
 	
 		this.HealthPoint = 100;
 				
 		//init snake dengan length = 3
 		this.length = 3;
+		
+		this.activeMultiplier = false;
 		
 		this.bodyX.add(240);
 		this.bodyY.add(200);
@@ -173,12 +177,28 @@ public class Snake implements Movable {
 		this.score = score;
 	}
 
+	public List<Integer> getBodyX() {
+		return bodyX;
+	}
+
+	public List<Integer> getBodyY() {
+		return bodyY;
+	}
+	
 	public int getHeadX() {
 		return bodyX.get(0);
 	}
 	
 	public int getHeadY() {
 		return bodyY.get(0);
+	}
+	
+	public boolean isActiveMultiplier() {
+		return activeMultiplier;
+	}
+
+	public void setActiveMultiplier(boolean activeMultiplier) {
+		this.activeMultiplier = activeMultiplier;
 	}
 	
 	public void addBody() {
