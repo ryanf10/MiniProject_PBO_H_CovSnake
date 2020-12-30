@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Cursor;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,6 +18,9 @@ public class MenuState extends GameState {
 	private Image backgroundMenu, newGameBtn, highScoreBtn, hover_newGameBtn, hover_highScoreBtn;
 
 	boolean isHoverA,isHoverB;
+	
+	Cursor default_ = new Cursor(Cursor.DEFAULT_CURSOR);
+	Cursor hand = new Cursor(Cursor.HAND_CURSOR);
 	
 	public MenuState(JFrame referred) {
 		super(referred);
@@ -46,8 +50,10 @@ public class MenuState extends GameState {
 			@Override
 			public void mouseMoved(MouseEvent e) {
 				
+				setCursor(default_);
 				//untuk newGameBtn
 				if(e.getPoint().x >=250 && e.getPoint().x <=550 && e.getPoint().y >= 325 && e.getPoint().y <= 405){
+					setCursor(hand);
 					isHoverA = true;
 					repaint();
 				}else{
@@ -57,6 +63,7 @@ public class MenuState extends GameState {
 				
 				//untuk highScoreBtn
 				if(e.getPoint().x >=250 && e.getPoint().x <=550 && e.getPoint().y >= 425 && e.getPoint().y <= 505){
+					setCursor(hand);
 					isHoverB = true;
 					repaint();
 				}else{
