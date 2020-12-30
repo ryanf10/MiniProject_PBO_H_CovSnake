@@ -26,6 +26,8 @@ import com.blazingduet.covsnake.food.Apple;
 import com.blazingduet.covsnake.food.Chicken;
 import com.blazingduet.covsnake.food.Food;
 import com.blazingduet.covsnake.food.Star;
+import com.blazingduet.covsnake.obstacle.Obstacle;
+import com.blazingduet.covsnake.obstacle.Stone;
 import com.blazingduet.covsnake.snake.Snake;
 
 public class PlayState extends GameState {
@@ -44,6 +46,7 @@ public class PlayState extends GameState {
 	private boolean isContinueBannerDrawn, isStarAlreadyOnMap;
 	private List<Character> tempMoveInput;
 	private List<Food> food;
+	private List<Obstacle> obstacle;
 	
 	public PlayState(JFrame referred) {
 		super(referred);
@@ -58,7 +61,11 @@ public class PlayState extends GameState {
 		snake = new Snake();
 		tempMoveInput = new ArrayList<>();
 		food = Collections.synchronizedList(new ArrayList<>());
+		obstacle = Collections.synchronizedList(new ArrayList<>());
+		
 		food.add(generateApple());
+		
+		
 		
 		this.addKeyListener(new KeyAdapter() {
 			@Override
@@ -83,6 +90,7 @@ public class PlayState extends GameState {
 					checkMove();
 					snake.move();
 					checkFood();
+					checkObstacle();
 					repaint();
 					try {
 						Thread.sleep(movementSpeedDelay/REFRESH_RATE);
@@ -202,8 +210,10 @@ public class PlayState extends GameState {
 				if(temp.eatenBySnake(snake)) {
 					this.foodEatenBySnake++;
 					
-					if(this.foodEatenBySnake % 5 == 0) {
-						//generate 5 obstacle
+					if(this.foodEatenBySnake % 5 == 0 && obstacle.size() < 50) {
+						for(int i = 0; i < 5; i++) {
+							obstacle.add(generateStone());
+						}
 					}
 					
 					if(temp instanceof Apple) {
@@ -233,7 +243,7 @@ public class PlayState extends GameState {
 				//generate star dengan chance 30%
 				if(!snake.isActiveMultiplier() && !isStarAlreadyOnMap) {
 					int rndGenerateStar = rnd.nextInt(101);
-					if(rndGenerateStar >= 0) {
+					if(rndGenerateStar >= 70) {
 						food.add(generateStar());
 						isStarAlreadyOnMap = true;
 					}
@@ -241,12 +251,22 @@ public class PlayState extends GameState {
 				
 				//generate chicken dengan chance 30%
 				int rndGenerateChicken = rnd.nextInt(101);
-				if(rndGenerateChicken >= 0) {
+				if(rndGenerateChicken >= 70) {
 					food.add(generateChicken());
 				}
 	
 			}
 						
+		}
+	}
+	
+	private void checkObstacle() {
+		synchronized(obstacle) {
+			Iterator<Obstacle> it = obstacle.iterator();
+			while(it.hasNext()) {
+				Obstacle temp = it.next();
+				temp.TouchedBySnake(snake);
+			}
 		}
 	}
 	
@@ -283,6 +303,17 @@ public class PlayState extends GameState {
 		return new Chicken(rndX,rndY,this);
 	}
 	
+	private Stone generateStone() {
+		Random rnd = new Random();
+		int rndX,rndY;
+		do {
+			rndX = rnd.nextInt(GRASS_AREA_WIDTH/Obstacle.WIDTH_SIZE) * Obstacle.WIDTH_SIZE + MAP_START_POSITION_X + GRASS_AREA_START_X;
+			rndY = rnd.nextInt(GRASS_AREA_HEIGHT/Obstacle.HEIGHT_SIZE) * Obstacle.HEIGHT_SIZE + MAP_START_POSITION_Y + GRASS_AREA_START_Y;
+		}while(!isSpaceAvailable(rndX,rndY) || !(Math.abs(rndX-snake.getHeadX()) > 100 || Math.abs(rndY-snake.getHeadY()) > 100));
+		
+		return new Stone(rndX,rndY);
+	}
+	
 	public boolean isSpaceAvailable(int positionX, int positionY) {
 		for(int i = 0; i < snake.getLength(); i++) {
 			if(snake.getBodyX().get(i) == positionX && snake.getBodyY().get(i) == positionY) {
@@ -294,6 +325,16 @@ public class PlayState extends GameState {
 			Iterator<Food> it = food.iterator();
 			while(it.hasNext()) {
 				Food temp = it.next();				
+				if(temp.getPositionX() == positionX && temp.getPositionY() == positionY) {	
+					return false;
+				}
+			}
+		}
+		
+		synchronized (obstacle) {
+			Iterator<Obstacle> it = obstacle.iterator();
+			while(it.hasNext()) {
+				Obstacle temp = it.next();				
 				if(temp.getPositionX() == positionX && temp.getPositionY() == positionY) {	
 					return false;
 				}
@@ -315,6 +356,14 @@ public class PlayState extends GameState {
 			Iterator<Food> it = food.iterator();
 			while(it.hasNext()) {
 				Food temp = it.next();				
+				temp.render(g);
+			}
+		}
+		
+		synchronized (obstacle) {
+			Iterator<Obstacle> it = obstacle.iterator();
+			while(it.hasNext()) {
+				Obstacle temp = it.next();				
 				temp.render(g);
 			}
 		}
