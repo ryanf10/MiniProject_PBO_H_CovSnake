@@ -16,12 +16,13 @@ public class Snake implements Movable {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/snake/";
 	public static final int MAX_HEALTH_POINT = 100;
 	private static Image headUp, headDown, headLeft, headRight, body;
+	private static Image headUpInfected, headDownInfected, headLeftInfected, headRightInfected, bodyInfected;
 	
 	private boolean isMovingUp, isMovingDown, isMovingLeft, isMovingRight;
 	private List<Integer> bodyX;
 	private List<Integer> bodyY;
-	private int length,HealthPoint,score;
-	private boolean activeMultiplier;
+	private int length,HealthPoint,score, infectedCount;
+	private boolean activeMultiplier, infected;
 	
 	public Snake() {
 		this.bodyX = Collections.synchronizedList(new ArrayList<>());
@@ -51,6 +52,12 @@ public class Snake implements Movable {
 		headRight = this.loadImg("HeadRight.png");
 		body = this.loadImg("Body.png");
 		
+		headUpInfected = this.loadImg("HeadUpInfected.png");
+		headDownInfected = this.loadImg("HeadDownInfected.png");
+		headLeftInfected = this.loadImg("HeadLeftInfected.png");
+		headRightInfected = this.loadImg("HeadRightInfected.png");
+		bodyInfected = this.loadImg("BodyInfected.png");
+		
 	}
 	
 	public void setDirection(boolean isMovingUp, boolean isMovingDown, boolean isMovingLeft, boolean isMovingRight) {
@@ -71,17 +78,33 @@ public class Snake implements Movable {
 
 	public void render(Graphics g) {
 		for(int i = 1; i < this.length; i++) {
-			g.drawImage(body, bodyX.get(i), bodyY.get(i), null);
+			if(!this.infected) {
+				g.drawImage(body, bodyX.get(i), bodyY.get(i), null);
+			}else {
+				g.drawImage(bodyInfected, bodyX.get(i), bodyY.get(i), null);
+			}
 		}
 		
-		if(isMovingUp) {
-			g.drawImage(headUp, bodyX.get(0),bodyY.get(0) ,null);
-		}else if(isMovingDown) {
-			g.drawImage(headDown, bodyX.get(0),bodyY.get(0) ,null);
-		}else if(isMovingLeft) {
-			g.drawImage(headLeft, bodyX.get(0),bodyY.get(0) ,null);
-		}else if(isMovingRight) {
-			g.drawImage(headRight, bodyX.get(0),bodyY.get(0) ,null);
+		if(!this.infected) {
+			if(isMovingUp) {
+				g.drawImage(headUp, bodyX.get(0),bodyY.get(0) ,null);
+			}else if(isMovingDown) {
+				g.drawImage(headDown, bodyX.get(0),bodyY.get(0) ,null);
+			}else if(isMovingLeft) {
+				g.drawImage(headLeft, bodyX.get(0),bodyY.get(0) ,null);
+			}else if(isMovingRight) {
+				g.drawImage(headRight, bodyX.get(0),bodyY.get(0) ,null);
+			}
+		}else {
+			if(isMovingUp) {
+				g.drawImage(headUpInfected, bodyX.get(0),bodyY.get(0) ,null);
+			}else if(isMovingDown) {
+				g.drawImage(headDownInfected, bodyX.get(0),bodyY.get(0) ,null);
+			}else if(isMovingLeft) {
+				g.drawImage(headLeftInfected, bodyX.get(0),bodyY.get(0) ,null);
+			}else if(isMovingRight) {
+				g.drawImage(headRightInfected, bodyX.get(0),bodyY.get(0) ,null);
+			}
 		}
 	}
 	
@@ -201,6 +224,22 @@ public class Snake implements Movable {
 		this.activeMultiplier = activeMultiplier;
 	}
 	
+	public int getInfectedCount() {
+		return infectedCount;
+	}
+
+	public void setInfectedCount(int infectedCount) {
+		this.infectedCount = infectedCount;
+	}
+
+	public boolean isInfected() {
+		return infected;
+	}
+
+	public void setInfected(boolean infected) {
+		this.infected = infected;
+	}
+
 	public void addBody() {
 		this.bodyX.add(bodyX.get(this.length-1));
 		this.bodyY.add(bodyY.get(this.length-1));

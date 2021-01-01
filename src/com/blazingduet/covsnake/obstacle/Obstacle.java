@@ -23,10 +23,12 @@ public abstract class Obstacle {
 	public abstract void giveDisadvantage(Snake snake);
 	public abstract void render(Graphics g);
 	
-	public void TouchedBySnake(Snake snake) {
+	public boolean TouchedBySnake(Snake snake) {
 		if(snake.getHeadX() == this.positionX && snake.getHeadY() == this.positionY) {
 			this.giveDisadvantage(snake);
+			return true;
 		}
+		return false;
 	}
 	
 	protected Image loadImg(String filename) {

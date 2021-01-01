@@ -26,6 +26,7 @@ import com.blazingduet.covsnake.food.Apple;
 import com.blazingduet.covsnake.food.Chicken;
 import com.blazingduet.covsnake.food.Food;
 import com.blazingduet.covsnake.food.Star;
+import com.blazingduet.covsnake.obstacle.CoronaVirus;
 import com.blazingduet.covsnake.obstacle.Obstacle;
 import com.blazingduet.covsnake.obstacle.Stone;
 import com.blazingduet.covsnake.snake.Snake;
@@ -210,9 +211,18 @@ public class PlayState extends GameState {
 				if(temp.eatenBySnake(snake)) {
 					this.foodEatenBySnake++;
 					
-					if(this.foodEatenBySnake % 5 == 0 && obstacle.size() < 50) {
-						for(int i = 0; i < 5; i++) {
-							obstacle.add(generateStone());
+					if(this.foodEatenBySnake % 5 == 0) {
+						if(obstacle.size() < 50) {
+							for(int i = 0; i < 5; i++) {
+								obstacle.add(generateStone());
+							}
+						}
+						
+						//random kemunculan corona virus 40%
+						Random rnd = new Random();
+						int rndCoronaVirus = rnd.nextInt(101);
+						if(rndCoronaVirus >= 60) {
+							obstacle.add(generateCoronaVirus());
 						}
 					}
 					
@@ -265,7 +275,15 @@ public class PlayState extends GameState {
 			Iterator<Obstacle> it = obstacle.iterator();
 			while(it.hasNext()) {
 				Obstacle temp = it.next();
-				temp.TouchedBySnake(snake);
+				if(temp.TouchedBySnake(snake)) {
+					if(temp instanceof CoronaVirus) {
+						it.remove();
+					}
+				}else if(temp instanceof CoronaVirus) {
+					if(!((CoronaVirus)temp).isAvailable()) {
+						it.remove();
+					}
+				}
 			}
 		}
 	}
@@ -312,6 +330,17 @@ public class PlayState extends GameState {
 		}while(!isSpaceAvailable(rndX,rndY) || !(Math.abs(rndX-snake.getHeadX()) > 100 || Math.abs(rndY-snake.getHeadY()) > 100));
 		
 		return new Stone(rndX,rndY);
+	}
+	
+	private CoronaVirus generateCoronaVirus() {
+		Random rnd = new Random();
+		int rndX,rndY;
+		do {
+			rndX = rnd.nextInt(GRASS_AREA_WIDTH/Obstacle.WIDTH_SIZE) * Obstacle.WIDTH_SIZE + MAP_START_POSITION_X + GRASS_AREA_START_X;
+			rndY = rnd.nextInt(GRASS_AREA_HEIGHT/Obstacle.HEIGHT_SIZE) * Obstacle.HEIGHT_SIZE + MAP_START_POSITION_Y + GRASS_AREA_START_Y;
+		}while(!isSpaceAvailable(rndX,rndY) || !(Math.abs(rndX-snake.getHeadX()) > 100 || Math.abs(rndY-snake.getHeadY()) > 100));
+		
+		return new CoronaVirus(rndX,rndY);
 	}
 	
 	public boolean isSpaceAvailable(int positionX, int positionY) {
