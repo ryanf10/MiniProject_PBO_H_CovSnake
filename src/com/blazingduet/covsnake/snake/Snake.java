@@ -168,7 +168,7 @@ public class Snake implements Movable {
 	}
 
 	public int getHealthPointBar() {
-		return (int)((float)HealthPoint/(float)MAX_HEALTH_POINT * (float)118);
+		return (int)((float)HealthPoint/(float)MAX_HEALTH_POINT * (float)112);
 	}
 	
 	public void setHealthPoint(int HealthPoint) {
