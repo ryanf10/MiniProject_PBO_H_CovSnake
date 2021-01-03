@@ -39,7 +39,7 @@ public class PlayState extends GameState {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
 	
-	private static Image header, map, gameOverBanner,continueBanner;
+	private static Image header, map, gameOverBanner,continueBanner,heart;
 	
 	private Snake snake;
 	private int score, foodEatenBySnake;
@@ -55,6 +55,7 @@ public class PlayState extends GameState {
 		map = loadImg("Map.png");
 		gameOverBanner = loadImg("GameOver.png");
 		continueBanner = loadImg("Continue.png");
+		heart = loadImg("HP.png");
 		this.score = 0;
 		this.foodEatenBySnake = 0;
 		this.movementSpeedDelay = 5000;
@@ -65,8 +66,6 @@ public class PlayState extends GameState {
 		obstacle = Collections.synchronizedList(new ArrayList<>());
 		
 		food.add(generateApple());
-		
-		
 		
 		this.addKeyListener(new KeyAdapter() {
 			@Override
@@ -375,10 +374,22 @@ public class PlayState extends GameState {
 	
 	@Override
 	public void render(Graphics g) {
+		
 		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
 		g.drawString("Score: "+snake.getScore(),100, 40);
-		g.drawString("HP: "+snake.getHealthPoint(),600, 40);
 		
+		g.setColor(Color.BLACK);
+		g.drawRoundRect(600, 27, 120, 30, 25, 25);
+		
+		Color barBackgroundHP = new Color(242, 242, 237);
+		g.setColor(barBackgroundHP);
+		g.fillRoundRect(602, 28, 118, 29, 28, 28);
+		
+		Color barHP = new Color(65, 217, 65);
+		g.setColor(barHP);
+		g.fillRoundRect(602, 28, snake.getHealthPointBar(), 29, 28, 28);
+		
+		g.drawImage(heart, 578, 20, null);
 		g.drawImage(map, MAP_START_POSITION_X, MAP_START_POSITION_Y, null);
 		
 		synchronized (food) {
@@ -416,9 +427,8 @@ public class PlayState extends GameState {
 		g2.drawRect(2, 82, 796, 516);
 		g2.setStroke(oldStroke);
 		
-		
 	}
-
+	
 	@Override
 	public void stateChange(int state) {
 		switch(state) {

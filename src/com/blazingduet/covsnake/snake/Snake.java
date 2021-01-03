@@ -167,6 +167,10 @@ public class Snake implements Movable {
 		return HealthPoint;
 	}
 
+	public int getHealthPointBar() {
+		return (int)((float)HealthPoint/(float)MAX_HEALTH_POINT * (float)118);
+	}
+	
 	public void setHealthPoint(int HealthPoint) {
 		if(HealthPoint > MAX_HEALTH_POINT) {
 			this.HealthPoint = MAX_HEALTH_POINT;
