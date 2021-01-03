@@ -39,7 +39,7 @@ public class PlayState extends GameState {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
 	
-	private static Image header, map, gameOverBanner,continueBanner,heart;
+	private static Image header, map, gameOverBanner,continueBanner,heart,multiplier;
 	
 	private Snake snake;
 	private int score, foodEatenBySnake;
@@ -56,6 +56,7 @@ public class PlayState extends GameState {
 		gameOverBanner = loadImg("GameOver.png");
 		continueBanner = loadImg("Continue.png");
 		heart = loadImg("HP.png");
+		multiplier = loadImg("MultiplierActive.png");
 		this.score = 0;
 		this.foodEatenBySnake = 0;
 		this.movementSpeedDelay = 5000;
@@ -377,7 +378,12 @@ public class PlayState extends GameState {
 		
 		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
 		g.drawString("Score: "+snake.getScore(),100, 40);
-		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
+		
+		if(snake.isActiveMultiplier()) {
+			g.drawImage(multiplier, 170, 13, null);
+		}
+		
+		//warna HP bar
 		g.setColor(Color.BLACK);
 		g.drawRoundRect(600, 27, 120, 30, 25, 25);
 		
