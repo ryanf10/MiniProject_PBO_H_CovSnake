@@ -377,7 +377,6 @@ public class PlayState extends GameState {
 		
 		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
 		g.drawString("Score: "+snake.getScore(),100, 40);
-		
 		g.setColor(Color.BLACK);
 		g.drawRoundRect(600, 27, 120, 30, 25, 25);
 		
@@ -385,11 +384,20 @@ public class PlayState extends GameState {
 		g.setColor(barBackgroundHP);
 		g.fillRoundRect(602, 28, 118, 29, 28, 28);
 		
-		Color barHP = new Color(65, 217, 65);
-		g.setColor(barHP);
-		g.fillRoundRect(602, 28, snake.getHealthPointBar(), 29, 28, 28);
+		Color barHP_green = new Color(65, 217, 65);
+		Color barHP_yellow = new Color(235, 235, 52);
+		Color barHP_red = new Color(232, 71, 53);
 		
-		g.drawImage(heart, 578, 20, null);
+		if(snake.getHealthPoint() >= 54) {
+			g.setColor(barHP_green);
+		}
+		else if(snake.getHealthPoint() >= 20 && snake.getHealthPoint() <= 53) {
+			g.setColor(barHP_yellow);
+		}
+		else g.setColor(barHP_red);
+		g.fillRoundRect(602, 28, snake.getHealthPointBar(), 29, 22, 22);
+		
+		g.drawImage(heart, 579, 20, null);
 		g.drawImage(map, MAP_START_POSITION_X, MAP_START_POSITION_Y, null);
 		
 		synchronized (food) {
