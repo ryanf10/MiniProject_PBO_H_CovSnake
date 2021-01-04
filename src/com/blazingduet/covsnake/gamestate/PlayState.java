@@ -39,7 +39,9 @@ public class PlayState extends GameState {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
 	
-	private static Image header, map, gameOverBanner,heart,enterUsernameImg, okayButton;
+
+	private static Image header, map, gameOverBanner,continueBanner,heart,multiplier,enterUsernameImg, okayButton;
+
 	
 	private Snake snake;
 
@@ -57,8 +59,12 @@ public class PlayState extends GameState {
 		map = loadImg("Map.png");
 		gameOverBanner = loadImg("GameOver.png");
 		heart = loadImg("HP.png");
+
 		enterUsernameImg = loadImg("EnterUsername.png");
 		okayButton = loadImg("OKButton.png");
+
+		multiplier = loadImg("MultiplierActive.png");
+
 		this.foodEatenBySnake = 0;
 		this.movementSpeedDelay = 5000;
 		this.healthDecreaseDelay = 1000;
@@ -401,10 +407,18 @@ public class PlayState extends GameState {
 		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
 		g.drawString("Score: "+snake.getScore(),100, 40);
 		
+
 		//untuk mencetak timeCounter ke layar
 		this.drawTimeCounter(g);
 		
 		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
+
+		if(snake.isActiveMultiplier()) {
+			g.drawImage(multiplier, 170, 13, null);
+		}
+		
+		//warna HP bar
+
 		g.setColor(Color.BLACK);
 		g.drawRoundRect(600, 27, 120, 30, 25, 25);
 		
