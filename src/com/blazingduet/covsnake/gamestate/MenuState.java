@@ -7,6 +7,9 @@ import java.awt.event.MouseEvent;
 import java.awt.Cursor;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -109,6 +112,10 @@ public class MenuState extends GameState {
 			referred.validate();
 			referred.getContentPane().requestFocusInWindow();
 			break;
+		case 2:
+			referred.setContentPane(new HighScoreState(referred));
+			referred.validate();
+			referred.getContentPane().requestFocusInWindow();
 		}
 	}
 

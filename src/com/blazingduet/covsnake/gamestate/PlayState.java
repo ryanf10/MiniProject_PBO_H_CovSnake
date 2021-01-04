@@ -20,7 +20,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
-import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.swing.JTextField;
 
 import com.blazingduet.covsnake.food.Apple;
 import com.blazingduet.covsnake.food.Chicken;
@@ -39,24 +39,26 @@ public class PlayState extends GameState {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
 	
-	private static Image header, map, gameOverBanner,continueBanner,heart;
+	private static Image header, map, gameOverBanner,heart,enterUsernameImg, okayButton;
 	
 	private Snake snake;
-	private int score, foodEatenBySnake;
-	private int movementSpeedDelay, healthDecreaseDelay;
-	private boolean isContinueBannerDrawn, isStarAlreadyOnMap;
+
+	private int foodEatenBySnake, movementSpeedDelay, healthDecreaseDelay;
+	private boolean isStarAlreadyOnMap, isGameOver;
 	private List<Character> tempMoveInput;
 	private List<Food> food;
 	private List<Obstacle> obstacle;
+	private float timeCounter;
+	private JTextField username;
 	
 	public PlayState(JFrame referred) {
 		super(referred);
 		header = loadImg("Header.png");
 		map = loadImg("Map.png");
 		gameOverBanner = loadImg("GameOver.png");
-		continueBanner = loadImg("Continue.png");
 		heart = loadImg("HP.png");
-		this.score = 0;
+		enterUsernameImg = loadImg("EnterUsername.png");
+		okayButton = loadImg("OKButton.png");
 		this.foodEatenBySnake = 0;
 		this.movementSpeedDelay = 5000;
 		this.healthDecreaseDelay = 1000;
@@ -64,6 +66,8 @@ public class PlayState extends GameState {
 		tempMoveInput = new ArrayList<>();
 		food = Collections.synchronizedList(new ArrayList<>());
 		obstacle = Collections.synchronizedList(new ArrayList<>());
+		
+		username = new JTextField();
 		
 		food.add(generateApple());
 		
@@ -92,10 +96,20 @@ public class PlayState extends GameState {
 					checkFood();
 					checkObstacle();
 					repaint();
+					if(snake.getHealthPoint() <= 0) {
+						break;
+					}
 					try {
 						Thread.sleep(movementSpeedDelay/REFRESH_RATE);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
+					}
+					timeCounter += (float)movementSpeedDelay/(float)REFRESH_RATE; //tambah timeCounter
+				}
+				if(snake.getHealthPoint() <= 0) {
+					if(!isGameOver) {
+						addGameOverSection();
+						isGameOver = true;
 					}
 				}
 			}
@@ -118,9 +132,10 @@ public class PlayState extends GameState {
 				}
 				
 				if(snake.getHealthPoint() <= 0) {
-					snake.setHealthPoint(0);
-					addListenerGameOver();
-					makeContinueBannerAnimation();
+					if(!isGameOver) {
+						addGameOverSection();
+						isGameOver = true;
+					}
 				}
 			}
 		};
@@ -153,52 +168,25 @@ public class PlayState extends GameState {
 			
 		}
 	}
-
 	
-	
-	private void addListenerGameOver() {
-		this.removeKeyListener(this.getKeyListeners()[0]);
-		
-		this.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				stateChange(0);
-			}
-		});
+	private void addGameOverSection() {
+		snake.setHealthPoint(0);
+		username.setBounds(400,305,150,30);
+		this.add(username);
+		username.requestFocus();
 		
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				stateChange(0);
-			}
-		});
-	}
-	
-	private void makeContinueBannerAnimation() {
-		Thread continueAnimationThread = new Thread() {
-			@Override
-			public void run() {
-				while(true) {
-					isContinueBannerDrawn = true;
-					repaint();
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					isContinueBannerDrawn = false;
-					repaint();
-					try {
-						Thread.sleep(1000);						
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+				if(e.getX() >= 560 && e.getX() <= 635 && e.getY() >= 305 && e.getY() <= 335) {
+					stateChange(0);
 				}
 			}
-		};
-		continueAnimationThread.start();
+		});
+		
+		repaint();
 	}
-	
+
 	private void checkFood() {
 		//hapus food yang sudah termakan
 		boolean doGenerateFood = false;
@@ -372,11 +360,50 @@ public class PlayState extends GameState {
 		return true;
 	}
 	
+	public int timeCounterHour() {
+		return (int)(timeCounter/(60.00 * 60.00 * 1000.00));
+	}
+	
+	public int timeCounterMinute() {
+		return (int)(timeCounter/(60.00 * 1000.00));
+	}
+	
+	public int timeCounterSecond() {
+		return (int)(timeCounter/(1000.00));
+	}
+	
+	public void drawTimeCounter(Graphics g) {
+		StringBuffer sb = new StringBuffer();
+		if(this.timeCounterHour() >= 10) {
+			sb.append(this.timeCounterHour()+":");
+		}else {
+			sb.append("0"+this.timeCounterHour()+":");
+		}
+		
+		if(this.timeCounterMinute() >= 10) {
+			sb.append(this.timeCounterMinute()+":");
+		}else {
+			sb.append("0"+this.timeCounterMinute()+":");
+		}
+		
+		if(this.timeCounterSecond() >= 10) {
+			sb.append(this.timeCounterSecond());
+		}else {
+			sb.append("0"+this.timeCounterSecond());
+		}
+		
+		g.drawString(sb.toString(), 400, 40);
+	}
+	
 	@Override
 	public void render(Graphics g) {
 		
 		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
 		g.drawString("Score: "+snake.getScore(),100, 40);
+		
+		//untuk mencetak timeCounter ke layar
+		this.drawTimeCounter(g);
+		
 		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
 		g.setColor(Color.BLACK);
 		g.drawRoundRect(600, 27, 120, 30, 25, 25);
@@ -421,9 +448,8 @@ public class PlayState extends GameState {
 		
 		if(snake.getHealthPoint() <= 0) {
 			g.drawImage(gameOverBanner, 0, 260, null);
-			if(isContinueBannerDrawn) {
-				g.drawImage(continueBanner, 0, 300, null);
-			}
+			g.drawImage(enterUsernameImg, 100, 300, null);
+			g.drawImage(okayButton, 560, 305, null);
 		}
 		
 		//map & header border
@@ -442,6 +468,7 @@ public class PlayState extends GameState {
 	public void stateChange(int state) {
 		switch(state) {
 		case 0:
+			saveScore();
 			referred.setContentPane(new MenuState(referred));
 			referred.validate();
 			referred.getContentPane().requestFocusInWindow();
@@ -449,6 +476,31 @@ public class PlayState extends GameState {
 		}
 	}
 	
-	
+	private void saveScore() {
+		//untuk highscore berdasarkan jumlah skor
+		List<User> userScorePodium = User.load("score.txt");
+		User.setCompareType(0);
+		if(userScorePodium == null) {
+			userScorePodium = new ArrayList<>();
+		}		
+		userScorePodium.add(new User(snake.getScore(),this.timeCounter, username.getText()));		
+		Collections.sort(userScorePodium);			
+		User.save(userScorePodium, "score.txt");
+		
+		
+		//untuk highscore berdasarkan survive time
+		List<User> userSurviveTimePodium = User.load("time.txt");
+		User.setCompareType(1);
+		if(userSurviveTimePodium == null) {
+			userSurviveTimePodium = new ArrayList<>();
+		}		
+		userSurviveTimePodium.add(new User(snake.getScore(), this.timeCounter, username.getText()));		
+		Collections.sort(userSurviveTimePodium);
+		User.save(userSurviveTimePodium, "time.txt");
 
+	}
+	
 }
+
+
+
