@@ -2,6 +2,7 @@ package com.blazingduet.covsnake.gamestate;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -39,9 +40,12 @@ public class PlayState extends GameState {
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
 	private static final int REFRESH_RATE = 30;
 	
+	Cursor default_ = new Cursor(Cursor.DEFAULT_CURSOR);
+	Cursor hand = new Cursor(Cursor.HAND_CURSOR);
 
-	private static Image header, map, gameOverBanner,continueBanner,heart,multiplier,enterUsernameImg, okayButton;
+	private static Image header, map, gameOverBanner,continueBanner,heart,multiplier,enterUsernameImg, okayButton, okayButtonHover;
 
+	boolean isHover;
 	
 	private Snake snake;
 
@@ -59,10 +63,9 @@ public class PlayState extends GameState {
 		map = loadImg("Map.png");
 		gameOverBanner = loadImg("GameOver.png");
 		heart = loadImg("HP.png");
-
 		enterUsernameImg = loadImg("EnterUsername.png");
 		okayButton = loadImg("OKButton.png");
-
+		okayButtonHover = loadImg("OKButtonHover.png");
 		multiplier = loadImg("MultiplierActive.png");
 
 		this.foodEatenBySnake = 0;
@@ -92,6 +95,21 @@ public class PlayState extends GameState {
 			}
 		});
 		this.setFocusable(true);
+		
+		this.addMouseMotionListener(new MouseAdapter(){
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				
+				setCursor(default_);
+				isHover = false;
+				repaint();
+				if(e.getPoint().x >=560 && e.getPoint().x <=635 && e.getPoint().y >= 305 && e.getPoint().y <= 335){
+					setCursor(hand);
+					isHover = true;
+					repaint();
+				};
+			}
+		});
 		
 		Thread moveThread = new Thread() {
 			@Override
@@ -463,7 +481,10 @@ public class PlayState extends GameState {
 		if(snake.getHealthPoint() <= 0) {
 			g.drawImage(gameOverBanner, 0, 260, null);
 			g.drawImage(enterUsernameImg, 100, 300, null);
-			g.drawImage(okayButton, 560, 305, null);
+			if(isHover) {
+				g.drawImage(okayButtonHover, 560, 305, null);
+			}
+			else g.drawImage(okayButton, 560, 305, null);
 		}
 		
 		//map & header border

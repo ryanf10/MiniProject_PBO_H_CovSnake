@@ -1,6 +1,7 @@
 package com.blazingduet.covsnake.gamestate;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
@@ -19,11 +20,16 @@ public class HighScoreState extends GameState {
 	private final static String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/highscore/";
 	private final static int SCORE_PODIUM_STATE = 1, SURVIVE_TIME_PODIUM_STATE = 2;
 	
-	private Image backgroundHighScore, scorePodiumBtn, surviveTimePodiumBtn,scorePodiumActiveBtn, surviveTimePodiumActiveBtn, backBtn;
+	private Image backgroundHighScore, scorePodiumBtn, surviveTimePodiumBtn,scorePodiumActiveBtn, surviveTimePodiumActiveBtn, backBtn, backHover;
 	
 	private int podiumState;
 	private List<User> userScorePodium;
 	private List<User> userSurviveTimePodium;
+	
+	boolean isHover;
+	
+	Cursor default_ = new Cursor(Cursor.DEFAULT_CURSOR);
+	Cursor hand = new Cursor(Cursor.HAND_CURSOR);
 	
 	public HighScoreState(JFrame referred) {
 		super(referred);
@@ -33,6 +39,7 @@ public class HighScoreState extends GameState {
 		surviveTimePodiumBtn = loadImg("SurviveTimePodiumButton.png");
 		surviveTimePodiumActiveBtn = loadImg("SurviveTimePodiumActiveButton.png");
 		backBtn = loadImg("Back.png");
+		backHover = loadImg("BackHover.png");
 		podiumState = SCORE_PODIUM_STATE;
 		
 		this.userScorePodium = User.load("score.txt");
@@ -66,6 +73,32 @@ public class HighScoreState extends GameState {
 				if(e.getPoint().x >=250 && e.getPoint().x <= 550 && e.getPoint().y >= 450 && e.getPoint().y <= 530){
 					stateChange(0);
 				};
+			}
+		});
+		
+		addMouseMotionListener(new MouseAdapter() {
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				
+				setCursor(default_);
+				isHover = false;
+				
+				//untuk scorePodiumBtn
+				if(e.getPoint().x >=250 && e.getPoint().x <400 && e.getPoint().y >= 70 && e.getPoint().y <= 150){
+					setCursor(hand);
+				};
+				
+				//untuk surviveTimePodiumBtn
+				if(e.getPoint().x >=401 && e.getPoint().x <= 550 && e.getPoint().y >= 70 && e.getPoint().y <= 150){
+					setCursor(hand);
+				};
+				
+				if(e.getPoint().x >=250 && e.getPoint().x <= 550 && e.getPoint().y >= 450 && e.getPoint().y <= 530){
+					setCursor(hand);
+					isHover = true;
+					repaint();
+				};
+				repaint();
 			}
 		});
 	
@@ -132,7 +165,11 @@ public class HighScoreState extends GameState {
 				g.drawString(sb.toString(), startX, startY + 30 * i);
 			}
 		}
-		g.drawImage(backBtn, 250, 450, null);
+		
+		if(isHover) {
+			g.drawImage(backHover, 250, 450, null);
+		}
+		else g.drawImage(backBtn, 250, 450, null);
 	}
 
 	@Override
