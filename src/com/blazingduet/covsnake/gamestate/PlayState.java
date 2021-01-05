@@ -21,6 +21,7 @@ import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import com.blazingduet.covsnake.food.Apple;
@@ -203,14 +204,20 @@ public class PlayState extends GameState {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getX() >= 560 && e.getX() <= 635 && e.getY() >= 305 && e.getY() <= 335) {
-					stateChange(0);
+					if(username.getText().isEmpty()) {
+						JOptionPane.showMessageDialog(null, "The field is empty");
+					}
+					else if(username.getText().length() > 8) {
+						JOptionPane.showMessageDialog(null, "Maximum number of characters is 8");
+					}
+					else stateChange(0);
 				}
 			}
 		});
 		
 		repaint();
 	}
-
+	
 	private void checkFood() {
 		//hapus food yang sudah termakan
 		boolean doGenerateFood = false;
@@ -501,13 +508,11 @@ public class PlayState extends GameState {
 	
 	@Override
 	public void stateChange(int state) {
-		switch(state) {
-		case 0:
+		if(state == 0) {
 			saveScore();
 			referred.setContentPane(new MenuState(referred));
 			referred.validate();
 			referred.getContentPane().requestFocusInWindow();
-			break;
 		}
 	}
 	
