@@ -2,7 +2,10 @@ package com.blazingduet.covsnake.gamestate;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,6 +21,7 @@ import javax.swing.JFrame;
 public class HighScoreState extends GameState {
 	
 	private final static String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/highscore/";
+	private static final String FONT_LOCATION = "src/com/blazingduet/covsnake/resources/font/";
 	private final static int SCORE_PODIUM_STATE = 1, SURVIVE_TIME_PODIUM_STATE = 2;
 	
 	private Image backgroundHighScore, scorePodiumBtn, surviveTimePodiumBtn,scorePodiumActiveBtn, surviveTimePodiumActiveBtn, backBtn, backHover;
@@ -27,6 +31,8 @@ public class HighScoreState extends GameState {
 	private List<User> userSurviveTimePodium;
 	
 	boolean isHover;
+	
+	Font kongtext;
 	
 	Cursor default_ = new Cursor(Cursor.DEFAULT_CURSOR);
 	Cursor hand = new Cursor(Cursor.HAND_CURSOR);
@@ -115,7 +121,19 @@ public class HighScoreState extends GameState {
 	
 	@Override
 	public void render(Graphics g) {
+		Color fontColor = new Color(247, 247, 240);
+		
+		try {
+			kongtext = Font.createFont(Font.TRUETYPE_FONT, new File(FONT_LOCATION + "kongtext.ttf")).deriveFont(15f);
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("kongtext.ttf")));
+		
+		} catch (IOException | FontFormatException e) {
+			// TODO: handle exception
+		}
+		
 		g.drawImage(backgroundHighScore, 0, 0, null);
+		g.setFont(kongtext);
 		if(podiumState == SCORE_PODIUM_STATE) {
 			g.drawImage(scorePodiumActiveBtn, 250, 70, null);
 			g.drawImage(surviveTimePodiumBtn, 400, 70, null);
@@ -128,7 +146,7 @@ public class HighScoreState extends GameState {
 			for(int i = 0; i < userScorePodium.size() && i < 5; i++) {
 				StringBuffer sb = new StringBuffer();
 				sb.append(i+1 + ". " + userScorePodium.get(i).getNama() + " " + userScorePodium.get(i).getScore() + " points");
-				g.drawString(sb.toString(), startX, startY + 30 * i);
+				g.drawString(sb.toString(), startX, startY + 50 * i);
 			}
 
 			
@@ -162,7 +180,7 @@ public class HighScoreState extends GameState {
 					sb.append("0"+userSurviveTimePodium.get(i).getSurviveTimeSecond());
 				}
 				
-				g.drawString(sb.toString(), startX, startY + 30 * i);
+				g.drawString(sb.toString(), startX, startY + 50 * i);
 			}
 		}
 		

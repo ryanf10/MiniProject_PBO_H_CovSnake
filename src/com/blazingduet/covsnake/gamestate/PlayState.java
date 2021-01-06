@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Stroke;
 import java.awt.event.KeyAdapter;
@@ -12,6 +13,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.awt.Font;
+import java.awt.FontFormatException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,12 +42,15 @@ public class PlayState extends GameState {
 	public static final int GRASS_AREA_START_X = 80, GRASS_AREA_START_Y = 60, GRASS_AREA_WIDTH = 640, GRASS_AREA_HEIGHT = 400;
 	
 	private static final String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/gameplay/";
+	private static final String FONT_LOCATION = "src/com/blazingduet/covsnake/resources/font/";
 	private static final int REFRESH_RATE = 30;
 	
 	Cursor default_ = new Cursor(Cursor.DEFAULT_CURSOR);
 	Cursor hand = new Cursor(Cursor.HAND_CURSOR);
+	
+	Font kongtext;
 
-	private static Image header, map, gameOverBanner,continueBanner,heart,multiplier,enterUsernameImg, okayButton, okayButtonHover;
+	private static Image header, map, gameOverBanner,heart,multiplier,enterUsernameImg, okayButton, okayButtonHover;
 
 	boolean isHover;
 	
@@ -200,15 +206,17 @@ public class PlayState extends GameState {
 		this.add(username);
 		username.requestFocus();
 		
+		PlayState temp = this;
+		
 		this.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if(e.getX() >= 560 && e.getX() <= 635 && e.getY() >= 305 && e.getY() <= 335) {
 					if(username.getText().isEmpty()) {
-						JOptionPane.showMessageDialog(null, "The field is empty");
+						JOptionPane.showMessageDialog(temp, "The field is empty");
 					}
 					else if(username.getText().length() > 8) {
-						JOptionPane.showMessageDialog(null, "Maximum number of characters is 8");
+						JOptionPane.showMessageDialog(temp, "Maximum number of characters is 8");
 					}
 					else stateChange(0);
 				}
@@ -423,23 +431,36 @@ public class PlayState extends GameState {
 			sb.append("0"+this.timeCounterSecond());
 		}
 		
-		g.drawString(sb.toString(), 400, 40);
+		g.drawString(sb.toString(), 350, 45);
 	}
 	
 	@Override
 	public void render(Graphics g) {
 		
-		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
-		g.drawString("Score: "+snake.getScore(),100, 40);
+		Color fontColor = new Color(247, 247, 240);
 		
-
+		g.drawImage(header, HEADER_START_POSITION_X, HEADER_START_POSITION_Y, null);
+		
+		try {
+			kongtext = Font.createFont(Font.TRUETYPE_FONT, new File(FONT_LOCATION + "kongtext.ttf")).deriveFont(12f);
+			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+			ge.registerFont(Font.createFont(Font.TRUETYPE_FONT, new File("kongtext.ttf")));
+		
+		} catch (IOException | FontFormatException e) {
+			// TODO: handle exception
+		}
+		
+		g.setColor(fontColor);
+		g.setFont(kongtext);
+		g.drawString("Score: "+snake.getScore(), 70, 45);
+		
 		//untuk mencetak timeCounter ke layar
 		this.drawTimeCounter(g);
 		
 		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
 
 		if(snake.isActiveMultiplier()) {
-			g.drawImage(multiplier, 170, 13, null);
+			g.drawImage(multiplier, 220, 14, null);
 		}
 		
 		//warna HP bar
