@@ -51,11 +51,11 @@ public class User implements Comparable<User>, Serializable{
 	}
 	
 	public int getSurviveTimeMinute() {
-		return (int)(this.surviveTime/(60.00 * 1000.00));
+		return (int)(this.surviveTime/(60.00 * 1000.00)) - getSurviveTimeHour() * 60;
 	}
 	
 	public int getSurviveTimeSecond() {
-		return (int)(this.surviveTime/(1000.00));
+		return (int)(this.surviveTime/(1000.00)) - getSurviveTimeMinute() * 60;
 	}
 
 	public static List<User> load(String filename) {

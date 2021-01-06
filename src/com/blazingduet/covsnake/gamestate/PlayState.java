@@ -162,6 +162,7 @@ public class PlayState extends GameState {
 					}
 				}
 				
+				
 				if(snake.getHealthPoint() <= 0) {
 					if(!isGameOver) {
 						addGameOverSection();
@@ -226,6 +227,18 @@ public class PlayState extends GameState {
 		repaint();
 	}
 	
+	private void changeDifficulty(){
+		this.movementSpeedDelay -= 200;
+		if(this.movementSpeedDelay < 2000) {
+			this.movementSpeedDelay = 2000;
+		}
+		
+		this.healthDecreaseDelay -= 40;
+		if(this.healthDecreaseDelay < 800) {
+			this.healthDecreaseDelay = 800;
+		}
+	}
+	
 	private void checkFood() {
 		//hapus food yang sudah termakan
 		boolean doGenerateFood = false;
@@ -238,6 +251,12 @@ public class PlayState extends GameState {
 					this.foodEatenBySnake++;
 					
 					if(this.foodEatenBySnake % 5 == 0) {
+						//setiap ular makan 5 makanan
+						
+						//tambah kecepatan
+						changeDifficulty();
+						
+						//tambah obstacle
 						if(obstacle.size() < 50) {
 							for(int i = 0; i < 5; i++) {
 								obstacle.add(generateStone());
@@ -404,11 +423,11 @@ public class PlayState extends GameState {
 	}
 	
 	public int timeCounterMinute() {
-		return (int)(timeCounter/(60.00 * 1000.00));
+		return (int)(timeCounter/(60.00 * 1000.00)) - timeCounterHour() * 60;
 	}
 	
 	public int timeCounterSecond() {
-		return (int)(timeCounter/(1000.00));
+		return (int)(timeCounter/(1000.00)) - timeCounterMinute() * 60;
 	}
 	
 	public void drawTimeCounter(Graphics g) {
