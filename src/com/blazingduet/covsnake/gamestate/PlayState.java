@@ -502,7 +502,7 @@ public class PlayState extends GameState {
 			g.setColor(barHP_yellow);
 		}
 		else g.setColor(barHP_red);
-		g.fillRoundRect(608, 28, snake.getHealthPointBar(), 29, 25, 25);
+		g.fillRoundRect(607, 28, snake.getHealthPointBar(), 29, 25, 25);
 		
 		g.drawImage(heart, 580, 20, null);
 		g.drawImage(map, MAP_START_POSITION_X, MAP_START_POSITION_Y, null);
