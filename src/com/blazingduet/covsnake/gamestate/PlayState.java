@@ -203,9 +203,7 @@ public class PlayState extends GameState {
 	
 	private void addGameOverSection() {
 		snake.setHealthPoint(0);
-		username.setBounds(400,305,150,30);
 		this.add(username);
-		username.requestFocus();
 		
 		PlayState temp = this;
 		
@@ -525,9 +523,12 @@ public class PlayState extends GameState {
 		
 		snake.render(g);
 		
-		if(snake.getHealthPoint() <= 0) {
+		if(isGameOver) {
 			g.drawImage(gameOverBanner, 0, 260, null);
 			g.drawImage(enterUsernameImg, 100, 300, null);
+			username.setBounds(400,305,150,30);
+			username.requestFocus();
+			
 			if(isHover) {
 				g.drawImage(okayButtonHover, 560, 305, null);
 			}
