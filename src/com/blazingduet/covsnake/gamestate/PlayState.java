@@ -474,7 +474,7 @@ public class PlayState extends GameState {
 		//untuk mencetak timeCounter ke layar
 		this.drawTimeCounter(g);
 		
-		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
+//		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
 
 		if(snake.isActiveMultiplier()) {
 			g.drawImage(multiplier, 220, 14, null);
