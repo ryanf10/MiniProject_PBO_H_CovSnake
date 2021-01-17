@@ -12,7 +12,6 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -58,7 +57,6 @@ public class HighScoreState extends GameState {
 			userSurviveTimePodium = new ArrayList<>();
 		}
 
-		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -121,7 +119,6 @@ public class HighScoreState extends GameState {
 	
 	@Override
 	public void render(Graphics g) {
-		Color fontColor = new Color(247, 247, 240);
 		
 		try {
 			kongtext = Font.createFont(Font.TRUETYPE_FONT, new File(FONT_LOCATION + "kongtext.ttf")).deriveFont(15f);
@@ -138,7 +135,6 @@ public class HighScoreState extends GameState {
 			g.drawImage(scorePodiumActiveBtn, 250, 70, null);
 			g.drawImage(surviveTimePodiumBtn, 400, 70, null);
 			
-
 			
 			//tampilkan 5 user dengan skor tertinggi
 			g.setColor(Color.WHITE);
@@ -148,8 +144,7 @@ public class HighScoreState extends GameState {
 				sb.append(i+1 + ". " + userScorePodium.get(i).getNama() + " " + userScorePodium.get(i).getScore() + " points");
 				g.drawString(sb.toString(), startX, startY + 50 * i);
 			}
-
-			
+	
 			
 		}else if(podiumState == SURVIVE_TIME_PODIUM_STATE) {
 			g.drawImage(scorePodiumBtn, 250, 70, null);

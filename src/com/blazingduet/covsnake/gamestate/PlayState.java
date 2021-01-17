@@ -31,6 +31,7 @@ import com.blazingduet.covsnake.food.Apple;
 import com.blazingduet.covsnake.food.Chicken;
 import com.blazingduet.covsnake.food.Food;
 import com.blazingduet.covsnake.food.Star;
+import com.blazingduet.covsnake.gamelauncher.GameLauncher;
 import com.blazingduet.covsnake.obstacle.CoronaVirus;
 import com.blazingduet.covsnake.obstacle.Obstacle;
 import com.blazingduet.covsnake.obstacle.Stone;
@@ -74,6 +75,8 @@ public class PlayState extends GameState {
 		okayButton = loadImg("OKButton.png");
 		okayButtonHover = loadImg("OKButtonHover.png");
 		multiplier = loadImg("MultiplierActive.png");
+		
+		GameLauncher.music.playMusic(GameLauncher.MUSIC_LOCATION + "PlayStateMusic.wav");
 
 		this.foodEatenBySnake = 0;
 		this.movementSpeedDelay = 5000;
@@ -473,8 +476,6 @@ public class PlayState extends GameState {
 		
 		//untuk mencetak timeCounter ke layar
 		this.drawTimeCounter(g);
-		
-//		g.drawString("health: "+snake.getHealthPoint(), 600, 80);
 
 		if(snake.isActiveMultiplier()) {
 			g.drawImage(multiplier, 220, 14, null);
@@ -550,8 +551,11 @@ public class PlayState extends GameState {
 	@Override
 	public void stateChange(int state) {
 		if(state == 0) {
+			GameState gs = new MenuState(referred);
+			GameLauncher.music.stopAll();
 			saveScore();
-			referred.setContentPane(new MenuState(referred));
+			((MenuState)gs).play();
+			referred.setContentPane(gs);
 			referred.validate();
 			referred.getContentPane().requestFocusInWindow();
 		}

@@ -14,10 +14,14 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import com.blazingduet.covsnake.gamelauncher.GameLauncher;
+import com.blazingduet.covsnake.music.MusicStuff;
+
 public class MenuState extends GameState {
 
 	private final static String DEFAULT_LOCATION = "src/com/blazingduet/covsnake/resources/menu/";
-	
+	private final static String MUSIC_LOCATION = "src/com/blazingduet/covsnake/music/";
+			
 	private Image backgroundMenu, newGameBtn, highScoreBtn, hover_newGameBtn, hover_highScoreBtn;
 
 	boolean isHoverA,isHoverB;
@@ -76,7 +80,10 @@ public class MenuState extends GameState {
 			}
 		});
 	}	
-	
+
+	public void play() {
+		GameLauncher.music.playMusic(MUSIC_LOCATION + "MenuStateMusic.wav");
+	}
 	
 	private Image loadImg(String filename) {
 		try {
@@ -108,6 +115,7 @@ public class MenuState extends GameState {
 	public void stateChange(int state) {
 		switch(state) {
 		case 1:
+			GameLauncher.music.stopAll();
 			referred.setContentPane(new PlayState(referred));
 			referred.validate();
 			referred.getContentPane().requestFocusInWindow();
