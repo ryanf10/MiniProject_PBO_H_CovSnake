@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -20,6 +21,9 @@ public class MusicStuff {
 			AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
 			clip = AudioSystem.getClip();
 			clip.open(audioStream);
+			FloatControl volume = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+			float volumeRange = volume.getMaximum() - volume.getMinimum();
+			volume.setValue(volumeRange * (float)0.7 + volume.getMinimum());
 			clip.start();
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 	     } catch (UnsupportedAudioFileException e) {
